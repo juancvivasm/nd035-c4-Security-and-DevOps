@@ -1,10 +1,12 @@
 package com.example.demo.controllers;
 
+import java.security.SecureRandom;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,11 +43,24 @@ public class UserController {
 	
 	@PostMapping("/create")
 	public ResponseEntity<User> createUser(@RequestBody CreateUserRequest createUserRequest) {
+		if(createUserRequest.getPassword().length()<7 ||
+				!createUserRequest.getPassword().equals(createUserRequest.getConfirmPassword())){
+			//System.out.println("Error - Either length is less than 7 or pass and conf pass do not match. Unable to create ",
+			//		createUserRequest.getUsername());
+			return ResponseEntity.badRequest().build();
+		}
+
+		int strength = 10; // work factor of bcrypt
+		SecureRandom secureRandom = new SecureRandom();
+		BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(strength, secureRandom);
+		String encodedPassword = bCryptPasswordEncoder.encode(createUserRequest.getPassword());
+
 		User user = new User();
 		user.setUsername(createUserRequest.getUsername());
 		Cart cart = new Cart();
 		cartRepository.save(cart);
 		user.setCart(cart);
+		user.setPassword(encodedPassword);
 		userRepository.save(user);
 		return ResponseEntity.ok(user);
 	}
