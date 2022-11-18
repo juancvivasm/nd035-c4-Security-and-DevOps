@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <appender name="Console"
+              class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>
+                %black(%d{ISO8601}) %highlight(%-5level) [%blue(%t)] %yellow(%C{1.}): %msg%n%throwable
+            </Pattern>
+        </layout>
+    </appender>
+
+    <Appender name="mySplunk"
+              class="com.splunk.logging.HttpEventCollectorLogbackAppender">
+        <url>http://localhost:8088</url>
+        <token>5bc33f5b-23e8-4651-a469-bd4010c3254d</token>
+        <index>order_api_dev</index>
+        <disableCertificateValidation>true</disableCertificateValidation>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>%msg</pattern>
+        </layout>
+    </Appender>
+
+    <!-- LOG everything at INFO level -->
+    <root level="info">
+        <appender-ref ref="Console" />
+    </root>
+
+    <!-- LOG "com.example.demo*" at TRACE level -->
+    <logger name="com.example.demo" level="trace" additivity="false">
+        <appender-ref ref="Console" />
+    </logger>
+
+    <logger name ="com.example.demo" level="debug" >
+        <appender-ref ref="mySplunk" />
+    </logger>
+</configuration>

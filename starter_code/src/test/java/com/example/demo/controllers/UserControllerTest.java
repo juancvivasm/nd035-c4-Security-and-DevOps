@@ -1,6 +1,7 @@
 package com.example.demo.controllers;
 
 import com.example.demo.TestUtils;
+import com.example.demo.exceptions.MyResourceBadRequestException;
 import com.example.demo.model.persistence.User;
 import com.example.demo.model.persistence.repositories.CartRepository;
 import com.example.demo.model.persistence.repositories.UserRepository;
@@ -10,17 +11,19 @@ import org.junit.Test;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import java.util.Optional;
+
+import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class UserControllerTest {
-
     private UserController userController;
     private UserRepository userRepo = mock(UserRepository.class);
     private CartRepository cartRepo = mock(CartRepository.class);
     private BCryptPasswordEncoder encoder = mock(BCryptPasswordEncoder.class);
+    private User sampleUser;
 
     @Before
     public void setUp(){
@@ -28,6 +31,10 @@ public class UserControllerTest {
         TestUtils.injectObjects(userController, "userRepository", userRepo);
         TestUtils.injectObjects(userController, "cartRepository", cartRepo);
         TestUtils.injectObjects(userController, "bCryptPasswordEncoder", encoder);
+
+        sampleUser = new User();
+        sampleUser.setId(1L);
+        sampleUser.setUsername("sample");
     }
 
     @Test
@@ -35,7 +42,6 @@ public class UserControllerTest {
         when(encoder.encode("testPassword")).thenReturn("thisIsHashed");
 
         CreateUserRequest r = createUserHappy();
-
         final ResponseEntity<User> response = userController.createUser(r);
         assertNotNull(response);
         assertEquals(200, response.getStatusCodeValue());
@@ -49,34 +55,35 @@ public class UserControllerTest {
 
     @Test
     public void find_by_id(){
-        CreateUserRequest r = createUserHappy();
-        final ResponseEntity<User> response = userController.createUser(r);
-        User u = response.getBody();
-        assertNotNull(u);
-        assertEquals(0, u.getId());
+        when(userRepo.findById(anyLong())).thenReturn(Optional.ofNullable(sampleUser));
 
-        final ResponseEntity<User> responseById = userController.findById(u.getId());
-        User user = response.getBody();
+        final ResponseEntity<User> responseById = userController.findById(sampleUser.getId());
+        User user = responseById.getBody();
         assertNotNull(user);
-        assertEquals(u.getId(), user.getId());
-        assertEquals(u.getUsername(), user.getUsername());
+        assertEquals(sampleUser.getId(), user.getId());
+        assertEquals(sampleUser.getUsername(), user.getUsername());
+    }
 
+    @Test
+    public void create_user_sad_path() throws Exception {
+        try {
+            when(encoder.encode("testPassword")).thenReturn("thisIsHashed");
+            CreateUserRequest r = createUserSad();
+            final ResponseEntity<User> response = userController.createUser(r);
+        }catch (Exception e){
+            assertNotNull(e);
+        }
     }
 
     @Test
     public void find_by_user_name(){
-        CreateUserRequest r = createUserHappy();
-        final ResponseEntity<User> response = userController.createUser(r);
-        User u = response.getBody();
-        assertNotNull(u);
-        assertEquals(0, u.getId());
+        when(userRepo.findByUsername(anyString())).thenReturn(sampleUser);
 
-        final ResponseEntity<User> responseById = userController.findByUserName(u.getUsername());
+        final ResponseEntity<User> response = userController.findByUserName(sampleUser.getUsername());
         User user = response.getBody();
         assertNotNull(user);
-        assertEquals(u.getId(), user.getId());
-        assertEquals(u.getUsername(), user.getUsername());
-
+        assertEquals(sampleUser.getId(), user.getId());
+        assertEquals(sampleUser.getUsername(), user.getUsername());
     }
 
     private static CreateUserRequest createUserHappy() {
@@ -84,6 +91,14 @@ public class UserControllerTest {
         user.setUsername("test");
         user.setPassword("testPassword");
         user.setConfirmPassword("testPassword");
+        return user;
+    }
+
+    private static CreateUserRequest createUserSad() {
+        CreateUserRequest user = new CreateUserRequest();
+        user.setUsername("test");
+        user.setPassword("testPassword");
+        user.setConfirmPassword("testPasword");
         return user;
     }
 }

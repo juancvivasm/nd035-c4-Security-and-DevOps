@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <Appender name="%user_logger_name%" class="com.splunk.logging.HttpEventCollectorLogbackAppender">
+        <url>%scheme%://%host%:%port%</url>
+        <token>%user_httpeventcollector_token%</token>
+        <index>%user_index%</index>
+        <disableCertificateValidation>true</disableCertificateValidation>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>%msg</pattern>
+        </layout>
+    </Appender>
+    <logger name ="%user_logger_name%" level="debug">
+        <appender-ref ref="%user_logger_name%" />
+    </logger>
+</configuration>
