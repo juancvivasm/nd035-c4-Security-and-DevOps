@@ -11,7 +11,7 @@
 
     <Appender name="mySplunk"
               class="com.splunk.logging.HttpEventCollectorLogbackAppender">
-        <url>http://localhost:8088</url>
+        <url>http://192.168.1.110:8088</url>
         <token>5bc33f5b-23e8-4651-a469-bd4010c3254d</token>
         <index>order_api_dev</index>
         <disableCertificateValidation>true</disableCertificateValidation>
