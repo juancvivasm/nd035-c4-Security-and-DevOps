@@ -2,9 +2,9 @@
 <configuration>
     <Appender name="mySplunk"
               class="com.splunk.logging.HttpEventCollectorLogbackAppender">
-<!--        <url>http://192.168.1.110:8088</url>-->
-<!--        <token>5bc33f5b-23e8-4651-a469-bd4010c3254d</token>-->
-        <url>http://172.31.29.230:8088</url>
+<!--        <url>http://192.168.1.110:8088</url> -->
+<!--        <token>5bc33f5b-23e8-4651-a469-bd4010c3254d</token> -->
+        <url>http://34.227.194.182:8088</url>
         <token>f98bf6e0-bf72-41ba-a703-b495339a7fbe</token>
         <index>order_api_dev</index>
         <disableCertificateValidation>true</disableCertificateValidation>
