@@ -13,7 +13,7 @@
               class="com.splunk.logging.HttpEventCollectorLogbackAppender">
 <!--        <url>http://192.168.1.110:8088</url> -->
 <!--        <token>5bc33f5b-23e8-4651-a469-bd4010c3254d</token> -->
-        <url>http://34.227.194.182:8088</url>
+        <url>http://172.31.29.230:8088</url>
         <token>84e3238d-9eb3-4528-83f2-59229759c4a1</token>
         <index>order_api_dev</index>
         <disableCertificateValidation>true</disableCertificateValidation>
